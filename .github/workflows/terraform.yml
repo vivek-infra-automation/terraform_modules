@@ -22,6 +22,7 @@ jobs:
         terraform_version: 1.5.0
     
     - name: Configure AWS credentials
+      id: aws-creds
       continue-on-error: true
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -35,12 +36,24 @@ jobs:
     - name: Terraform Validate
       run: terraform validate
     
-    - name: Terraform Plan
+    - name: Check AWS Credentials
+      id: check-aws
       run: |
-        terraform plan --var-file=terraform.tfvars -out=tfplan
+        if aws sts get-caller-identity > /dev/null 2>&1; then
+          echo "aws-configured=true" >> $GITHUB_OUTPUT
+        else
+          echo "aws-configured=false" >> $GITHUB_OUTPUT
+          echo "⚠️ AWS credentials not configured - skipping plan"
+        fi
+    
+    - name: Terraform Plan
+      if: steps.check-aws.outputs.aws-configured == 'true'
+      run: |
+        terraform plan -var-file=terraform.tfvars -out=tfplan
         terraform show -no-color tfplan > plan-output.txt
     
     - name: Upload Plan Output
+      if: steps.check-aws.outputs.aws-configured == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: terraform-plan
