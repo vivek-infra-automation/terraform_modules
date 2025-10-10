@@ -37,7 +37,7 @@ jobs:
     
     - name: Terraform Plan
       run: |
-        terraform plan -out=tfplan
+        terraform plan --var-file=terraform.tfvars -out=tfplan
         terraform show -no-color tfplan > plan-output.txt
     
     - name: Upload Plan Output
