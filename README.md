@@ -86,3 +86,6 @@ See `examples/` directory for usage patterns and `terraform.tfvars.existing-vpc`
 - **Flexible networking**: New or existing VPC support
 - **Security**: EBS encryption, restricted SSH access
 - **Cost optimization**: Optional Elastic IPs, right-sized instances
+
+
+
